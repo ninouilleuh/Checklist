@@ -99,6 +99,32 @@
     text-decoration: line-through;
     color: #888;
 }
+.dragging {
+    opacity: 0.5;
+    background-color: #f0f0f0;
+}
+
+.task-item {
+    cursor: move;
+}
+.import-export {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.import-export button {
+    padding: 8px 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.import-export button:hover {
+    background-color: #45a049;
+}
     </style>
 </head>
 <body>
@@ -108,10 +134,18 @@
             <input type="text" id="taskInput" placeholder="Enter a new task">
             <button id="addTask">Add Task</button>
         </div>
+        <div class="import-export">
+            <button id="exportCSV">Export CSV</button>
+            <button id="exportTXT">Export TXT</button>
+            <input type="file" id="importFile" accept=".csv,.txt" style="display:none;">
+            <button id="importBtn">Import</button>
+        </div>
         <ul id="taskList"></ul>
     </div>
 
     <script>
+        let draggedItem = null;
+
         // Get DOM elements
         const taskInput = document.getElementById('taskInput');
         const addTaskButton = document.getElementById('addTask');
@@ -134,9 +168,43 @@
 
         // Create a new task element
         function createTaskElement(task) {
+            
             const li = document.createElement('li');
             li.classList.add('task-item');
 
+            // Add drag and drop attributes and events
+            li.setAttribute('draggable', 'true');
+
+            li.addEventListener('dragstart', (e) => {
+            draggedItem = li;
+            e.dataTransfer.effectAllowed = 'move';
+            li.classList.add('dragging');
+            });
+            li.addEventListener('dragend', () => {
+            draggedItem = null;
+            li.classList.remove('dragging');
+            saveTasks();
+            });
+
+            li.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            });
+
+            li.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (draggedItem !== li) {
+                const items = Array.from(taskList.children);
+                const draggedIndex = items.indexOf(draggedItem);
+                const targetIndex = items.indexOf(li);
+
+                if (draggedIndex < targetIndex) {
+                    taskList.insertBefore(draggedItem, li.nextSibling);
+                } else {
+                    taskList.insertBefore(draggedItem, li);
+                }
+            }
+        });
             // Task content wrapper
             const taskContent = document.createElement('div');
             taskContent.classList.add('task-content');
@@ -162,6 +230,7 @@
             editButton.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent task toggle
                 startEditing(li);
+                
             });
 
             // Delete button
@@ -336,6 +405,103 @@ li.addEventListener('click', (e) => {
 
         // Load existing tasks on page load
         loadTasks();
+
+        // Add these functions to your existing script
+
+// Export to CSV
+function exportToCSV() {
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    
+    // Create CSV content
+    const csvContent = [
+        "Task,Completed", // Header
+        ...tasks.map(task => 
+            `"${task.text.replace(/"/g, '""')}",${task.completed}`
+        )
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "checklist_export.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Export to TXT
+function exportToTXT() {
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    
+    // Create TXT content
+    const txtContent = tasks.map(task => 
+        `${task.completed ? '[x]' : '[ ]'} ${task.text}`
+    ).join('\n');
+
+    // Create and download file
+    const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "checklist_export.txt");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Import tasks
+function importTasks(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        let importedTasks = [];
+
+        // Detect file type and parse accordingly
+        if (file.name.endsWith('.csv')) {
+            // Parse CSV
+            const rows = content.split('\n').slice(1); // Skip header
+            importedTasks = rows
+                .filter(row => row.trim() !== '')
+                .map(row => {
+                    const [text, completed] = row.split(',');
+                    return {
+                        text: text.replace(/^"|"$/g, ''), // Remove quotes
+                        completed: completed.trim() === 'true'
+                    };
+                });
+        } else if (file.name.endsWith('.txt')) {
+            // Parse TXT
+            importedTasks = content.split('\n')
+                .filter(row => row.trim() !== '')
+                .map(row => {
+                    const completed = row.startsWith('[x]');
+                    const text = row.replace(/^$$[ x]$$\s*/, '');
+                    return { text, completed };
+                });
+        }
+
+        // Clear existing tasks and add imported tasks
+        taskList.innerHTML = '';
+        importedTasks.forEach(task => createTaskElement(task));
+        saveTasks();
+    };
+    reader.readAsText(file);
+}
+
+// Add event listeners
+document.getElementById('exportCSV').addEventListener('click', exportToCSV);
+document.getElementById('exportTXT').addEventListener('click', exportToTXT);
+document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change', importTasks);
     </script>
 </body>
 </html>
