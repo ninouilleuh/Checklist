@@ -1,0 +1,214 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    line-height: 1.6;
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 25px;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+#taskInput {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#addTask {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#addTask:hover {
+    background-color: #2980b9;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: background-color 0.2s;
+}
+
+.task-item:hover {
+    background-color: #f1f1f1;
+}
+
+.task-content {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.task-text {
+    flex-grow: 1;
+    margin-left: 15px;
+    font-size: 16px;
+    word-break: break-word;
+}
+.dragging {
+    opacity: 0.5;
+    background-color: #f0f0f0;
+}
+
+.task-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.btn {
+    background-color: transparent;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: color 0.2s;
+}
+
+.edit-btn {
+    color: #3498db;
+}
+
+.delete-btn {
+    color: #e74c3c;
+}
+
+.btn:hover {
+    opacity: 0.7;
+}
+.subtask-list {
+    margin-left: 30px;
+    border-left: 2px solid #e0e0e0;
+    padding-left: 15px;
+    margin-top: 10px;
+}
+
+.subtask-item {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    transition: background-color 0.2s;
+}
+
+.subtask-item:hover {
+    background-color: #f0f0f0;
+}
+
+.subtask-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+.subtask-item .task-text {
+    flex-grow: 1;
+    font-size: 14px;
+    color: #555;
+}
+
+.subtask-item .btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    transition: color 0.2s;
+}
+
+.subtask-item .btn:hover {
+    color: #e74c3c;
+}
+
+.add-subtask-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-left: 10px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.add-subtask-btn:hover {
+    background-color: #2980b9;
+}
+
+.add-subtask-btn::before {
+    content: '+';
+    margin-right: 5px;
+    font-weight: bold;
+}
+.due-date {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-left: 15px;
+}
+
+.due-date.overdue {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.due-date.due-soon {
+    color: #f39c12;
+}
+
+.import-export {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.import-export button {
+    flex-grow: 1;
+    padding: 10px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.import-export button:hover {
+    background-color: #3498db;
+}
